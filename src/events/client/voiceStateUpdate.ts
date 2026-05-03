@@ -60,7 +60,7 @@ export default class VoiceStateUpdateEvent extends Event<'voiceStateUpdate'> {
         const hasConnectPermission = permissions?.has('Connect') ?? false;
         if (!hasConnectPermission) {
           try {
-            await state.member.voice.disconnect('Room is locked');
+            await state.member.voice.disconnect('الغرفة مقفلة');
           } catch (error) {
             logger.error(`Failed to disconnect user:`, error instanceof Error ? error : undefined);
           }
@@ -176,13 +176,11 @@ export default class VoiceStateUpdateEvent extends Event<'voiceStateUpdate'> {
           { validateRelations: false, populate: false, useTransaction: false }
         );
 
-        // --- لوحة التحكم الشاملة ---
         const controlEmbed = new EmbedBuilder()
           .setTitle('🎙️ لوحة التحكم في الغرفة')
           .setDescription(`مرحباً بك <@${state.member.id}> في غرفتك الخاصة!\nاستعمل الأزرار أسفله للتحكم في الغرفة:`)
           .setColor('#2b2d31');
 
-        // السطر الأول: أزرار القفل والإخفاء والاسم
         const row1 = new ActionRowBuilder<ButtonBuilder>().addComponents(
           new ButtonBuilder().setCustomId('voice-lock').setLabel('قفل').setEmoji('🔒').setStyle(ButtonStyle.Secondary),
           new ButtonBuilder().setCustomId('voice-unlock').setLabel('فتح').setEmoji('🔓').setStyle(ButtonStyle.Secondary),
@@ -191,10 +189,8 @@ export default class VoiceStateUpdateEvent extends Event<'voiceStateUpdate'> {
           new ButtonBuilder().setCustomId('voice-rename').setLabel('تغيير الإسم').setEmoji('📝').setStyle(ButtonStyle.Primary)
         );
 
-        // السطر الثاني: أزرار العدد، الطرد، والمعلومات
         const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
-          new ButtonBuilder().setCustomId('voice-increase-limit').setLabel('زيادة العدد').setEmoji('➕').setStyle(ButtonStyle.Secondary),
-          new ButtonBuilder().setCustomId('voice-decrease-limit').setLabel('نقصان العدد').setEmoji('➖').setStyle(ButtonStyle.Secondary),
+          new ButtonBuilder().setCustomId('voice-increase-limit').setLabel('تحديد العدد').setEmoji('👥').setStyle(ButtonStyle.Secondary),
           new ButtonBuilder().setCustomId('voice-view').setLabel('معلومات').setEmoji('ℹ️').setStyle(ButtonStyle.Secondary),
           new ButtonBuilder().setCustomId('voice-claim').setLabel('استحواذ').setEmoji('👑').setStyle(ButtonStyle.Success),
           new ButtonBuilder().setCustomId('voice-disconnect').setLabel('طرد').setEmoji('🚫').setStyle(ButtonStyle.Danger)
