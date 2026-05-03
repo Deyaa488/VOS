@@ -17,13 +17,12 @@ export default class IncreaseButton extends Button {
     if (!voice) return interaction.reply({ content: '❌ لست في غرفة صوتية.', flags: MessageFlags.Ephemeral });
     
     const room = await getRoom(voice.id);
-    if (!room) return interaction.reply({ content: '❌ هذه ليست غرفة VoiceMaster.', flags: MessageFlags.Ephemeral });
+    if (!room) return interaction.reply({ content: '❌ هذه ليست غرفة خاصة بالبوت.', flags: MessageFlags.Ephemeral });
     
     if (room.ownerId !== interaction.user.id) {
       return interaction.reply({ content: '❌ لست مالك هذه الغرفة.', flags: MessageFlags.Ephemeral });
     }
 
-    // بناء نافذة تحديد العدد
     const modal = new ModalBuilder()
       .setCustomId('limit_room_modal')
       .setTitle('تحديد عدد الأشخاص 👥');
@@ -34,7 +33,7 @@ export default class IncreaseButton extends Button {
       .setStyle(TextInputStyle.Short)
       .setPlaceholder('مثال: 5')
       .setRequired(true)
-      .setMaxLength(2); // باش مايفوتش 99
+      .setMaxLength(2);
 
     const actionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(limitInput);
     modal.addComponents(actionRow);
