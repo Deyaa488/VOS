@@ -1,4 +1,12 @@
-import { VoiceState, ChannelType, VoiceChannel } from 'discord.js';
+import { 
+  VoiceState, 
+  ChannelType, 
+  VoiceChannel,
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle
+} from 'discord.js';
 import { Event } from '../../structures/Event';
 import { logger } from '../../utils/logger';
 import { getVoiceCreatorByGuildId } from '../../models/VoiceCreator';
@@ -398,6 +406,33 @@ export default class VoiceStateUpdateEvent extends Event<'voiceStateUpdate'> {
           }
         );
         logger.info(`[VOICEMASTER] ✅ Created private room ${newChannel.id} for user ${state.member.id} (${state.member.user.tag})`);
+        
+        // --- إضافة لوحة التحكم (Embed + Buttons) هنا ---
+        const controlEmbed = new EmbedBuilder()
+          .setTitle('🎙️ لوحة التحكم في الغرفة')
+          .setDescription(`مرحباً بك <@${state.member.id}> في غرفتك الخاصة!\n\nيمكنك التحكم في غرفتك باستعمال الأزرار أسفله:`)
+          .addFields(
+            { name: '🔒 القفل', value: 'لقفل أو فتح الغرفة للجميع', inline: true },
+            { name: '📝 الإسم', value: 'لتغيير اسم الغرفة', inline: true },
+            { name: '👻 الإخفاء', value: 'لإخفاء أو إظهار الغرفة', inline: true },
+            { name: '🚫 الطرد', value: 'لطرد شخص من الغرفة', inline: true }
+          )
+          .setColor('#2b2d31');
+
+        const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+          new ButtonBuilder().setCustomId('room_lock').setLabel('قفل/فتح').setEmoji('🔒').setStyle(ButtonStyle.Secondary),
+          new ButtonBuilder().setCustomId('room_rename').setLabel('تغيير الإسم').setEmoji('📝').setStyle(ButtonStyle.Secondary),
+          new ButtonBuilder().setCustomId('room_hide').setLabel('إخفاء/إظهار').setEmoji('👻').setStyle(ButtonStyle.Secondary),
+          new ButtonBuilder().setCustomId('room_kick').setLabel('طرد').setEmoji('🚫').setStyle(ButtonStyle.Danger)
+        );
+
+        await newChannel.send({
+          content: `<@${state.member.id}>`,
+          embeds: [controlEmbed],
+          components: [buttons],
+        });
+        // --- نهاية الإضافة ---
+
       } catch (dbError) {
         // Enhanced error logging
         logger.error(`[VOICEMASTER] ❌ Failed to save room to database:`, dbError instanceof Error ? dbError : undefined);
@@ -439,4 +474,3 @@ export default class VoiceStateUpdateEvent extends Event<'voiceStateUpdate'> {
     }
   }
 }
-
