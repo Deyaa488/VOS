@@ -17,21 +17,12 @@ export default class LockButton extends Button {
     const room = await getRoom(voice.id);
     if (!room) return;
     if (room.ownerId !== interaction.user.id) {
-      return interaction.reply({
-        content: 'You are not the owner of this room.',
-        flags: MessageFlags.Ephemeral,
-      });
+      return interaction.reply({ content: '❌ لست مالك هذه الغرفة.', flags: MessageFlags.Ephemeral });
     }
     if (voice instanceof VoiceChannel) {
-      await voice.permissionOverwrites.edit(interaction.guild.roles.everyone, {
-        Connect: false,
-      });
+      await voice.permissionOverwrites.edit(interaction.guild.roles.everyone, { Connect: false });
       await updateRoom(voice.id, { locked: true });
-      return interaction.reply({
-        content: '🔒 Locked the room.',
-        flags: MessageFlags.Ephemeral,
-      });
+      return interaction.reply({ content: '🔒 تم قفل الغرفة بنجاح. لا أحد يمكنه الدخول.', flags: MessageFlags.Ephemeral });
     }
   }
 }
-
