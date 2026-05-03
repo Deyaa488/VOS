@@ -1,6 +1,6 @@
-import { ButtonInteraction, MessageFlags, VoiceChannel } from 'discord.js';
+import { ButtonInteraction, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, MessageFlags } from 'discord.js';
 import { Button } from '../../structures/Button';
-import { getRoom, updateRoom } from '../../models/Room';
+import { getRoom } from '../../models/Room';
 
 export default class IncreaseButton extends Button {
   constructor(client: any) {
@@ -12,32 +12,33 @@ export default class IncreaseButton extends Button {
 
   public async execute(interaction: ButtonInteraction): Promise<any> {
     if (!interaction.guild) return;
+    
     const voice = interaction.guild?.members.cache.get(interaction.user.id)?.voice.channel;
-    if (!voice) return;
+    if (!voice) return interaction.reply({ content: '❌ لست في غرفة صوتية.', flags: MessageFlags.Ephemeral });
+    
     const room = await getRoom(voice.id);
-    if (!room) return;
+    if (!room) return interaction.reply({ content: '❌ هذه ليست غرفة VoiceMaster.', flags: MessageFlags.Ephemeral });
+    
     if (room.ownerId !== interaction.user.id) {
-      return interaction.reply({
-        content: 'You are not the owner of this room.',
-        flags: MessageFlags.Ephemeral,
-      });
+      return interaction.reply({ content: '❌ لست مالك هذه الغرفة.', flags: MessageFlags.Ephemeral });
     }
-    if (voice instanceof VoiceChannel) {
-      const currentLimit = voice.userLimit || 0;
-      if (currentLimit >= 99) {
-        return interaction.reply({
-          content: 'Maximum limit reached (99).',
-          flags: MessageFlags.Ephemeral,
-        });
-      }
-      const newLimit = currentLimit + 1;
-      await voice.setUserLimit(newLimit);
-      await updateRoom(voice.id, { limit: newLimit });
-      return interaction.reply({
-        content: `➕ Increased the limit to ${newLimit}.`,
-        flags: MessageFlags.Ephemeral,
-      });
-    }
+
+    // بناء نافذة تحديد العدد
+    const modal = new ModalBuilder()
+      .setCustomId('limit_room_modal')
+      .setTitle('تحديد عدد الأشخاص 👥');
+
+    const limitInput = new TextInputBuilder()
+      .setCustomId('new_room_limit')
+      .setLabel('أدخل العدد (0 للغرفة المفتوحة، أقصى حد 99)')
+      .setStyle(TextInputStyle.Short)
+      .setPlaceholder('مثال: 5')
+      .setRequired(true)
+      .setMaxLength(2); // باش مايفوتش 99
+
+    const actionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(limitInput);
+    modal.addComponents(actionRow);
+
+    await interaction.showModal(modal);
   }
 }
-
