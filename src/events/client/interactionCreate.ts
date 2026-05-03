@@ -13,7 +13,7 @@ import { logger } from '../../utils/logger';
 import { errorHandler } from '../../utils/errorHandler';
 import { embeds } from '../../utils/embeds';
 import { commands } from '../../commands';
-import { webhookService } from '../../services/webhookService';
+import { webhookService } from '../../services/webhookService'; // رجعنا هادي باش يخدم اللوغ مزيان
 import { cooldownManager } from '../../utils/cooldownManager';
 import { buttons } from '../../components/buttons';
 import { menus } from '../../components/menus';
@@ -28,7 +28,7 @@ export default class InteractionCreateEvent extends Event<'interactionCreate'> {
     });
   }
 
-  async execute(interaction: Interaction) {
+  async execute(interaction: Interaction): Promise<void> {
     const client = interaction.client as BotClient;
 
     // --- استقبال النوافذ (Modals) لتغيير الاسم والعدد ---
@@ -57,7 +57,9 @@ export default class InteractionCreateEvent extends Event<'interactionCreate'> {
         const voiceChannel = interaction.guild?.members.cache.get(interaction.user.id)?.voice.channel;
 
         if (isNaN(limitNumber) || limitNumber < 0 || limitNumber > 99) {
-          return interaction.reply({ content: '❌ المرجو إدخال رقم صحيح بين 0 و 99.', flags: MessageFlags.Ephemeral });
+          // حيدنا return من هنا ودرنا await باش TypeScript ما يغوتش
+          await interaction.reply({ content: '❌ المرجو إدخال رقم صحيح بين 0 و 99.', flags: MessageFlags.Ephemeral });
+          return;
         }
 
         if (voiceChannel && voiceChannel instanceof VoiceChannel) {
@@ -73,6 +75,7 @@ export default class InteractionCreateEvent extends Event<'interactionCreate'> {
         }
         return;
       }
+      return;
     }
 
     if (interaction.isButton()) {
