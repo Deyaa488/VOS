@@ -12,7 +12,7 @@ import DisconnectButton from './Disconnect';
 import ClaimButton from './Claim';
 import IncreaseButton from './Increase';
 import DecreaseButton from './Decrease';
-import RenameButton from './Rename'; // الزر الجديد ديالنا
+import RenameButton from './Rename';
 
 export const buttons = new Collection<string, Button>();
 
@@ -29,7 +29,7 @@ export function loadButtons(client: any): void {
     ClaimButton,
     IncreaseButton,
     DecreaseButton,
-    RenameButton, // ضفناه هنا باش البوت يقراه
+    RenameButton,
   ];
 
   for (const ButtonClass of buttonClasses) {
